@@ -5,14 +5,11 @@ const User = db.user;
 
 exports.signup = (req, res) => {
   bcrypt.genSalt(8, (err, salt) => {
-    console.log(req.body)
       bcrypt.hash(req.body.password, salt, (err, hash) => {
-        console.log(hash, salt)
         if (err) {
           res.status(500).send({ message, success: false });
           throw err;
         }
-    
         const user = new User({
           username: req.body.username,
           email: req.body.email,
@@ -20,13 +17,11 @@ exports.signup = (req, res) => {
           lastName: req.body.lastName,
           password: hash,
         });
-    
         user.save((err, user) => {
           if (err) {
             res.status(500).send({ message: err, success: false });
             return;
           }
-    
           res.status(201).send({ 
             message: "User was registered successfully!",
             success: true,
@@ -42,12 +37,12 @@ exports.signin = (req, res) => {
   })
     .exec((err, user) => {
       if (err) {
-        res.status(500).send({ message: err });
+        res.status(500).send({ message: err, success: false });
         throw err;
       }
 
       if (!user) {
-        return res.status(404).send({ message: "User Not found." });
+        return res.status(404).send({ message: "User Not found.", success: false });
       }
 
       var passwordIsValid = bcrypt.compare(
@@ -56,28 +51,19 @@ exports.signin = (req, res) => {
       );
 
       if (!passwordIsValid) {
-        return res.status(401).send({ message: "Invalid Password!" });
+        return res.status(401).send({ message: "Invalid Password!", success: false });
       }
 
-      var token = jwt.sign({ id: user.id }, process.env.AUTH_KEY, {
-        expiresIn: 86400,
+      var token = jwt.sign({ id: req.body.username, email: req.body.email }, process.env.AUTH_KEY, {
+        expiresIn: '1h',
       });
-
-      req.session.token = token;
 
       res.status(200).send({
         username: user.username,
         email: user.email,
         fullName: user.fullName,
+        token: token,
+        success: true,
       });
     });
-};
-
-exports.signout = async (req, res) => {
-  try {
-    req.session = null;
-    return res.status(200).send({ message: "You've been signed out!" });
-  } catch (err) {
-    this.next(err);
-  }
 };

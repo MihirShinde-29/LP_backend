@@ -1,5 +1,7 @@
 const verifySignUp = require("../middlewares/verifySignup");
-const controller = require("../controllers/auth.controller");
+const authJwt = require("../middlewares/auth");
+const authController = require("../controllers/auth.controller");
+const newsController = require("../controllers/news.controller");
 
 module.exports = (app) => {
   app.use((req, res, next) => {
@@ -13,10 +15,14 @@ module.exports = (app) => {
   app.post(
     "/api/auth/signup",
     verifySignUp.checkDuplicateUsernameOrEmail,
-    controller.signup
+    authController.signup
   );
-
-  app.post("/api/auth/signin", controller.signin);
-
-  app.post("/api/auth/signout", controller.signout);
+  
+  app.post("/api/auth/signin", authController.signin);
+  
+  app.get(
+    "/news",
+    authJwt.verifyToken,
+    newsController.getNews
+  );
 };
