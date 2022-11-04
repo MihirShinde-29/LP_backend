@@ -14,6 +14,7 @@ exports.getNews = (req, res) => {
         response.on('data', d => {
             data.push(d); 
         }).on('error',e => {
+            res.status(500).send({ message: e, success: false });
             console.log(e);
         });
         response.on('end',()=>{

@@ -5,10 +5,14 @@ const User = db.user;
 
 exports.signup = (req, res) => {
   bcrypt.genSalt(8, (err, salt) => {
+      if (err) {
+        res.status(500).send({ message: err, success: false });
+        return;
+      }
       bcrypt.hash(req.body.password, salt, (err, hash) => {
         if (err) {
           res.status(500).send({ message: err, success: false });
-          throw err;
+          return;
         }
         const user = new User({
           username: req.body.username,
@@ -38,7 +42,7 @@ exports.signin = (req, res) => {
     .exec((err, user) => {
       if (err) {
         res.status(500).send({ message: err, success: false });
-        throw err;
+        return;
       }
 
       if (!user) {
