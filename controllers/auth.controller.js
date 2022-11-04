@@ -7,7 +7,7 @@ exports.signup = (req, res) => {
   bcrypt.genSalt(8, (err, salt) => {
       bcrypt.hash(req.body.password, salt, (err, hash) => {
         if (err) {
-          res.status(500).send({ message, success: false });
+          res.status(500).send({ message: err, success: false });
           throw err;
         }
         const user = new User({

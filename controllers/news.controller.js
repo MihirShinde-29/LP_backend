@@ -5,7 +5,7 @@ exports.getNews = (req, res) => {
     const userAgent = req.get('user-agent');
     const options = {
         host: 'newsapi.org',
-        path: '/v2/top-headlines?country=in&apiKey=e26561f14f0f4041ad184f49da1a6fc6',
+        path: '/v2/top-headlines?country=in&apiKey=' + process.env.NEWS_API_KEY,
         headers: {
             'User-Agent': userAgent
         }
